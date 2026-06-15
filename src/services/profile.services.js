@@ -2,7 +2,7 @@ const { User } = require('../models');
 
 
 // update profile
-async function updateProfile(id, dto, requesterId, isAdmin) {
+async function updateProfile(id, dto, requesterId) {
     // get the id,  loggedin user and the update body
 
     // find the id
@@ -14,7 +14,7 @@ async function updateProfile(id, dto, requesterId, isAdmin) {
     }
 
     // check if the user id is same as the one logged in
-    if (!isAdmin && profile.id !== requesterId) {
+    if (profile.id !== requesterId) {
         throw Object.assign(new Error('forbidden'), {status: 403})
     }
 
@@ -27,7 +27,7 @@ async function updateProfile(id, dto, requesterId, isAdmin) {
 
 
 // delete profile
-async function deleteProfile(id, requesterId, isAdmin) {
+async function deleteProfile(id, requesterId) {
   const profile = await User.findByPk(id);
 
   // check if profile exist
@@ -36,7 +36,7 @@ async function deleteProfile(id, requesterId, isAdmin) {
     }
 
 
-  if (!isAdmin && profile.id !== requesterId) {
+  if (profile.id !== requesterId) {
     throw Object.assign(new Error('Forbidden'), { status: 403 });
   }
 

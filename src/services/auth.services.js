@@ -1,4 +1,4 @@
-const { User, Role } = require('../models');
+const { User, Role, Permission } = require('../models');
 const { hash, compare } = require('../utils/hash');
 const { generateAccessToken, generateRefreshToken, verifyAccessToken , verifyRefreshToken } = require('../utils/jwt');
 
@@ -26,6 +26,114 @@ async function register({name, email, password, roleName='user'}) {
 }
 
 
+// RBAC
+// create roles manually
+// create permissions
+// assign roles to users (editor/admin)
+// assign permssions manually to users 
+
+
+
+
+// create role 
+async function createRole({name}) {
+  
+  // check if role exists already
+  const existing = await Role.findOne({ where: { name }}); 
+  if (existing) throw Object.assign(new Error('Role already exists!'), {status: 409});
+
+
+  // save the role to DB
+  const role = await Role.create({name});
+
+  return `${name} added successfully`
+}
+
+
+// get all roles
+async function findAllRoles() {
+  const roles = await Role.findAll();
+
+  if (!roles) {
+    throw Object.assign(new Error('Roles not found'), {status: 404})
+  };
+
+  return roles
+}
+
+// delete a role
+async function deleteRole(id) {
+  const role = await Role.findOne({ where: { id } });
+
+  if (!role) {
+    throw Object.assign(new Error('Role not found'), { status: 404 });
+  }
+
+
+  await role.update({ deletedAt: new Date() });
+
+  return { message: 'Role deleted successfully' };
+}
+
+
+
+
+// Permission endpoints:
+async function createPermission({ name }) {
+  const existing = await Permission.findOne({ where: { name } });
+
+
+  if (existing) throw Object.assign(new Error('Permission already exists'), { status: 409 });
+
+  const permission = await Permission.create({ name });
+  return permission;
+}
+
+async function findAllPermissions() {
+  const permissions = await Permission.findAll();
+  if (!permissions) throw Object.assign(new Error('Permissions not found'), { status: 404 });
+  return permissions;
+}
+
+async function deletePermission(id) {
+  const permission = await Permission.findOne({ where: { id } });
+  if (!permission) throw Object.assign(new Error('Permission not found'), { status: 404 });
+
+ 
+  await permission.update({ deletedAt: new Date() });
+  return { message: 'Permission deleted successfully' };
+}
+
+
+
+// Assign permissions to roles:
+async function assignPermissionToRole(roleId, { permissionId }) {
+  const role = await Role.findByPk(roleId);
+
+
+  if (!role) throw Object.assign(new Error('Role not found'), { status: 404 });
+
+  const permission = await Permission.findByPk(permissionId);
+  if (!permission) throw Object.assign(new Error('Permission not found'), { status: 404 });
+
+  await role.addPermission(permission);
+  return { message: 'Permission assigned successfully' };
+}
+
+
+
+async function removePermissionFromRole(roleId, { permissionId }) {
+  const role = await Role.findByPk(roleId);
+  if (!role) throw Object.assign(new Error('Role not found'), { status: 404 });
+
+  const permission = await Permission.findByPk(permissionId);
+  if (!permission) throw Object.assign(new Error('Permission not found'), { status: 404 });
+
+  await role.removePermission(permission);
+  return { message: 'Permission removed successfully' };
+}
+
+
 
 
 
@@ -37,10 +145,7 @@ async function assignRole(id, {roleName}, requesterId) {
   if (!user) {
         throw Object.assign(new Error('User not a found'), { status: 404 });
     }
-
-  // if (user.id !== requesterId) {
-  //     throw Object.assign(new Error('Forbidden'), {status: 403})
-  // }
+  
 
   // find role
   const role = await Role.findOne({ where: { name: roleName } });
@@ -53,18 +158,6 @@ async function assignRole(id, {roleName}, requesterId) {
 
   return { message: 'Role assigned successfully' }
 }
-
-
-// users create account
-// admin can make a user an editor (assign role function)
-// admin can add permissions 
-
-
-
-
-
-
-
 
 
 // login user
@@ -120,4 +213,4 @@ async function logout(userId) {
 
 
 
-module.exports = { register, assignRole,login, refresh, logout };
+module.exports = { register, createRole, deleteRole,findAllRoles,createPermission, assignPermissionToRole,removePermissionFromRole,findAllPermissions, deletePermission,assignRole,login, refresh, logout };

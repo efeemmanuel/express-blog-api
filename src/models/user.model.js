@@ -26,6 +26,11 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    deletedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: null,
+    }
   },
   { tableName: 'users', underscored: true }
 );

@@ -9,7 +9,7 @@ async function createPost({title, content, status='draft'}, authorId) {
     if (existingPost) throw Object.assign(new Error('Post already exists'), {status: 409});
 
 
-    // save post to DB
+    // save post to DB 
     const post = await Post.create({title, content, status, author_id:authorId});
 
     return {title: post.title, content: post.content, status: post.status}

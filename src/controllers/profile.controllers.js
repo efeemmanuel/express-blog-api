@@ -11,8 +11,8 @@ async function updateProfile(req, res, next) {
 
 async function deleteProfile(req, res, next) {
     try {
-        const isAdmin = req.user.permissions.includes('manage_users');
-        await profileService.deleteProfile(req.params.id, req.user.id, isAdmin);
+        // const isAdmin = req.user.permissions.includes('manage_users');
+        await profileService.deleteProfile(req.params.id, req.user.id);
         res.status(204).send();
     } catch (err) {
         next(err);
