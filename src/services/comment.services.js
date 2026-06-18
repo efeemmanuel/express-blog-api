@@ -8,7 +8,8 @@ const { Comment, Post, User } = require('../models');
 // create comment
 async function createComment(id,{content},authorId) {
     // find the post using its id
-    const post = await Post.findByPk(id)
+    // const post = await Post.findByPk(id)
+    const post = await Post.findOne({ where: { id } });
 
     if (!post) {
         throw Object.assign(new Error('post not found'), {status: 404})

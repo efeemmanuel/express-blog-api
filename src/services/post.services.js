@@ -1,5 +1,5 @@
 const {  Post, User } = require('../models');
-
+const { Op } = require('sequelize');
 
 // create post
 async function createPost({title, content, status='draft'}, authorId) {
@@ -12,7 +12,8 @@ async function createPost({title, content, status='draft'}, authorId) {
     // save post to DB 
     const post = await Post.create({title, content, status, author_id:authorId});
 
-    return {title: post.title, content: post.content, status: post.status}
+    // return {title: post.title, content: post.content, status: post.status}
+    return post
 }
 
 

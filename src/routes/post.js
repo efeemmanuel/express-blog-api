@@ -144,7 +144,7 @@ router.post('/post', rateLimiter, authenticate, permit('create_post'), postContr
  *       403:
  *         description: Forbidden
  */
-router.get('/',rateLimiter, authenticate, postController.findAll);
+router.get('/',rateLimiter, postController.findAll);
 
 /**
  * @swagger

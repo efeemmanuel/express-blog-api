@@ -64,11 +64,3 @@ seed().catch((err) => {
 });
 
 
-
-
-
-// So perms is just saying:
-
-// "For this role (e.g. admin), go to ROLE_PERMISSIONS, get its permission names, then look each one up in permMap to get the full permission object from the DB"
-
-// Then addPermissions() is a Sequelize method that comes from the many-to-many association you defined earlier — it inserts the links into the role_permissions junction table automatically.

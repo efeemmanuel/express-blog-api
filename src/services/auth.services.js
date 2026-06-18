@@ -1,3 +1,4 @@
+const { TableHints } = require('sequelize');
 const { User, Role, Permission } = require('../models');
 const { hash, compare } = require('../utils/hash');
 const { generateAccessToken, generateRefreshToken, verifyAccessToken , verifyRefreshToken } = require('../utils/jwt');
@@ -60,6 +61,9 @@ async function findAllRoles() {
 
   return roles
 }
+
+
+
 
 // delete a role
 async function deleteRole(id) {
@@ -177,6 +181,32 @@ async function login({ email, password }) {
 }
 
 
+// me route
+async function currentUser(requesterId) {
+
+  // find the id
+  const user = await User.findOne({ where: {requesterId}});
+
+ 
+  if (!isAdmin && user.id !== requesterId) {
+        throw Object.assign(new Error('Forbidden'), { status: 403})
+    }
+
+  if (!user) {
+        throw Object.assign(new Error('post not found'), {status: 404})
+  }
+
+  return user
+
+
+  // check if the id exitis in users Table edge case
+
+  // check if it is the requester id that is equals to the requesterId.user id 
+
+  // return the user
+
+}
+
 
 
 // refresh token
@@ -193,8 +223,9 @@ async function refresh(token) {
     throw Object.assign(new Error('Refresh token reuse detected'), { status: 401 });
   }
 
-  const accessToken = signAccessToken({ sub: user.id });
-  const newRefreshToken = signRefreshToken({ sub: user.id });
+
+  const accessToken = generateAccessToken({ sub: user.id });
+  const newRefreshToken = generateRefreshToken({ sub: user.id });
 
   // Rotate refresh token
   await user.update({ refreshToken: newRefreshToken });
@@ -213,4 +244,4 @@ async function logout(userId) {
 
 
 
-module.exports = { register, createRole, deleteRole,findAllRoles,createPermission, assignPermissionToRole,removePermissionFromRole,findAllPermissions, deletePermission,assignRole,login, refresh, logout };
+module.exports = { register, createRole, currentUser,deleteRole,findAllRoles,createPermission, assignPermissionToRole,removePermissionFromRole,findAllPermissions, deletePermission,assignRole,login, refresh, logout };

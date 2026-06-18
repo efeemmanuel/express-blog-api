@@ -22,6 +22,16 @@ async function createRole(req,res,next) {
 
 
 
+async function currentUser(req,res,next) {
+  try {
+    const user = await authService.currentUser(req.user.id)
+    res.json(user);
+  } catch (err) {
+    next(err)
+  }
+}
+
+
 async function findAllRoles(req,res,next) {
   try {
     const role = await authService.findAllRoles()
@@ -143,4 +153,4 @@ async function logout(req, res, next) {
   }
 }
 
-module.exports = { register, updateUserRole, createRole,deleteRole,createPermission, findAllPermissions, deletePermission, assignPermissionToRole, removePermissionFromRole ,findAllRoles ,login, refresh, logout };
+module.exports = { register, updateUserRole, currentUser,createRole,deleteRole,createPermission, findAllPermissions, deletePermission, assignPermissionToRole, removePermissionFromRole ,findAllRoles ,login, refresh, logout };

@@ -315,6 +315,13 @@ router.delete('/roles/:id', authenticate, permit('manage_users'), authController
 router.patch('/:id/role', authenticate, permit('manage_users'), authController.updateUserRole);
 
 
+
+router.get('/me', authenticate, authController.currentUser);
+
+
+
+
+
 //permissions 
 
 /**
