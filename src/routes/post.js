@@ -176,7 +176,7 @@ router.get('/',rateLimiter, postController.findAll);
  *       404:
  *         description: Post not found
  */
-router.get('/:id', rateLimiter, authenticate, postController.findOne);
+router.get('/:id', rateLimiter, postController.findOne);
 
 /**
  * @swagger
