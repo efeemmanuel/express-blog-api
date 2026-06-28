@@ -4,6 +4,7 @@ const Role = require('./role.model');
 const Permission = require('./permission.model');
 const Post = require('./post.model');
 const Comment = require('./comment.model')
+const Category = require('./category.model');
 
 
 
@@ -43,4 +44,8 @@ User.hasMany(Comment, { as: 'comments', foreignKey: 'author_id' });
 
 
 
-module.exports = { sequelize, User, Role, Permission, Post, Comment };
+// Post <-> Category (many-to-many)
+Post.belongsToMany(Category, { through: 'post_categories', foreignKey: 'post_id', as: 'categories' });
+Category.belongsToMany(Post, { through: 'post_categories', foreignKey: 'category_id', as: 'posts' });
+
+module.exports = { sequelize, User, Role, Permission, Post, Comment, Category };

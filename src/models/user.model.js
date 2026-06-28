@@ -26,6 +26,10 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    profileImage: {
+      type: DataTypes.STRING,   
+      allowNull: true,
+    },
     deletedAt: {
     type: DataTypes.DATE,
     allowNull: true,

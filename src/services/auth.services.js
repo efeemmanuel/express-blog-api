@@ -6,7 +6,7 @@ const { generateAccessToken, generateRefreshToken, verifyAccessToken , verifyRef
 
 
 // create user
-async function register({name, email, password, roleName='user'}) {
+async function register({name, email, password, profileImage,roleName='user'}) {
     // edge case: check if email exisits
     const existing = await User.findOne({where : { email } });
     if (existing) throw Object.assign(new Error('Email already in use'), {status: 409});
@@ -14,7 +14,7 @@ async function register({name, email, password, roleName='user'}) {
     // hash password
     const hashed = await hash(password);
     // save the user to DB
-    const user = await User.create({ name, email, password: hashed });
+    const user = await User.create({ name, email, password: hashed, profileImage });
 
 
     // check for roleName in Role models if it exists
@@ -22,7 +22,7 @@ async function register({name, email, password, roleName='user'}) {
     if (role) await user.addRole(role);
 
     // return the data saved
-    return { id: user.id, name: user.name, email: user.email };
+    return { id: user.id, name: user.name, email: user.email, profileImage: user.profileImage };
 
 }
 
@@ -53,16 +53,23 @@ async function createRole({name}) {
 
 // get all roles
 async function findAllRoles() {
-  const roles = await Role.findAll();
+  const roles = await Role.findAll({
+        include: [{ model: Permission }]
+    });
 
   if (!roles) {
     throw Object.assign(new Error('Roles not found'), {status: 404})
   };
 
-  return roles
+  // return 
+  return roles.map(role => ({
+        id: role.id,
+        name: role.name,
+        deletedAt: role.deletedAt,
+        permissions: role.Permissions ?? []
+    }));
+
 }
-
-
 
 
 // delete a role
@@ -78,8 +85,6 @@ async function deleteRole(id) {
 
   return { message: 'Role deleted successfully' };
 }
-
-
 
 
 // Permission endpoints:
@@ -109,7 +114,6 @@ async function deletePermission(id) {
 }
 
 
-
 // Assign permissions to roles:
 async function assignPermissionToRole(roleId, { permissionId }) {
   const role = await Role.findByPk(roleId);
@@ -125,7 +129,6 @@ async function assignPermissionToRole(roleId, { permissionId }) {
 }
 
 
-
 async function removePermissionFromRole(roleId, { permissionId }) {
   const role = await Role.findByPk(roleId);
   if (!role) throw Object.assign(new Error('Role not found'), { status: 404 });
@@ -136,8 +139,6 @@ async function removePermissionFromRole(roleId, { permissionId }) {
   await role.removePermission(permission);
   return { message: 'Permission removed successfully' };
 }
-
-
 
 
 
@@ -158,15 +159,35 @@ async function assignRole(id, {roleName}, requesterId) {
         throw Object.assign(new Error('Role not found'), { status: 404 });
     }
 
-  await user.addRole(role);
+  // await user.addRole(role);
+  await user.setRoles([role]);
 
   return { message: 'Role assigned successfully' }
 }
 
 
 // login user
+// async function login({ email, password }) {
+//   const user = await User.findOne({ where: { email } });
+//   if (!user) throw Object.assign(new Error('Invalid credentials'), { status: 401 });
+
+//   const valid = await compare(password, user.password);
+//   if (!valid) throw Object.assign(new Error('Invalid credentials'), { status: 401 });
+
+//   const accessToken = generateAccessToken({ sub: user.id });
+//   const refreshToken = generateRefreshToken({ sub: user.id });
+
+//   await user.update({ refreshToken });
+
+//   return { accessToken, refreshToken };
+// }
+
 async function login({ email, password }) {
-  const user = await User.findOne({ where: { email } });
+  const user = await User.findOne({ 
+    where: { email },
+    include: [{ model: Role, include: [Permission] }]
+  });
+
   if (!user) throw Object.assign(new Error('Invalid credentials'), { status: 401 });
 
   const valid = await compare(password, user.password);
@@ -177,8 +198,29 @@ async function login({ email, password }) {
 
   await user.update({ refreshToken });
 
-  return { accessToken, refreshToken };
+  // for me to get the permissions for a user role 
+  const permissions = [
+    ...new Set(
+      user.Roles.flatMap((role) => role.Permissions.map((p) => p.name))
+    ),
+  ];
+
+  return { 
+    accessToken, 
+    refreshToken,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      profileImage: user.profileImage,
+      permissions  
+    }
+  };
 }
+
+
+
+
 
 
 // me route

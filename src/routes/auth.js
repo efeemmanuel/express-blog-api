@@ -2,6 +2,8 @@ const { Router } = require('express');
 const authController = require('../controllers/auth.controllers.js');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { permit } = require('../middlewares/permission.middleware');
+const upload = require('../middlewares/upload');
+
 
 const router = Router();
 
@@ -114,7 +116,8 @@ const router = Router();
  *       409:
  *         description: Email already in use
  */
-router.post('/register', authController.register);
+
+router.post('/register', upload.single('profileImage'), authController.register);
 
 
 /**

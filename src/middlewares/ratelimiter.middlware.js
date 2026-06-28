@@ -7,8 +7,8 @@ const redisClient = new Redis({
   db: 0, //db number
 })
 
-const WINDOW_SIZE_IN_SECONDS = 60; // 1 minute
-const MAX_REQUESTS = 10;
+const WINDOW_SIZE_IN_SECONDS = 6000; // 1 minute
+const MAX_REQUESTS = 1000;
 
 const rateLimiter = async (req, res, next) => {
   try {

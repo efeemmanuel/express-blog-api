@@ -2,15 +2,16 @@ const { DataTypes } = require('sequelize');
 const sequelize  = require('../config/database');
 
 
-const Comment = sequelize.define(
-    'Comment',
+
+const Category = sequelize.define(
+    'Category',
     {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
         },
-        content: {
+        name: {
             type: DataTypes.TEXT,
             allowNull: false,
 
@@ -20,8 +21,7 @@ const Comment = sequelize.define(
             allowNull: true,
         },
 
-    },
-    { tableName: 'comments', underscored: true }
+    }
 )
 
-module.exports = Comment;
+module.exports = Category;

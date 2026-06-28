@@ -1,13 +1,40 @@
 const authService = require('../services/auth.services.js');
+const cloudinary = require('../config/cloudinary');
+const streamifier = require('streamifier');
+
+
+
+
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: 'avatars', resource_type: 'image' },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
+};
 
 async function register(req, res, next) {
   try {
-    const user = await authService.register(req.body);
+    let profileImage = null;
+
+    // if a file was uploaded, send it to Cloudinary first
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      profileImage = result.secure_url;
+    }
+
+    const user = await authService.register({ ...req.body, profileImage });
     res.status(201).json(user);
   } catch (err) {
     next(err);
   }
 }
+
 
 
 

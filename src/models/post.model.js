@@ -17,6 +17,14 @@ const Post = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    coverImage: {
+      type: DataTypes.STRING,   
+      allowNull: true,
+    },
+    isFeatured: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.ENUM('draft', 'published'),
       defaultValue: 'draft',
