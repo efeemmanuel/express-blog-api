@@ -23,7 +23,7 @@ const app = express();
 
 // CORS
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'https://insidebox-pied.vercel.app',
   credentials: true
 }));
 
