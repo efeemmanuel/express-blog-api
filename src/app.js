@@ -20,10 +20,11 @@ const setupSwagger = require('./swagger');
 
 const app = express();
 
+// https://insidebox-pied.vercel.app
 
 // CORS
 app.use(cors({
-  origin: 'https://insidebox-pied.vercel.app',
+  origin: 'http://localhost:5173',
   credentials: true
 }));
 
@@ -43,7 +44,7 @@ app.use("/api/upload", uploadRouter);
 app.use("/api/category", categoryRouter);
 
 
-
+// for file storage
 app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({ error: 'File too large. Max size is 5MB.' });

@@ -3,6 +3,7 @@ const postController = require('../controllers/post.controllers');
 const { authenticate } = require('../middlewares/auth.middleware');
 const { permit } = require('../middlewares/permission.middleware');
 const rateLimiter = require('../middlewares/ratelimiter.middlware');
+const idempotency = require('../middlewares/idempotency');
 
 
 const router = Router();
@@ -90,7 +91,7 @@ const router = Router();
  *       403:
  *         description: Forbidden
  */
-router.post('/post', rateLimiter, authenticate, permit('create_post'), postController.createPost);
+router.post('/post', rateLimiter, authenticate, idempotency,permit('create_post'), postController.createPost);
 
 /**
  * @swagger
