@@ -20,11 +20,10 @@ const setupSwagger = require('./swagger');
 
 const app = express();
 
-// https://insidebox-pied.vercel.app
 
 // CORS
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'https://insidebox-pied.vercel.app',
   credentials: true
 }));
 
